@@ -1,6 +1,5 @@
 from collections import Counter
 import statistics
-import matplotlib.pyplot as plt
 
 rhythm1 = []
 with open('Ритм 1.txt') as f:
@@ -51,9 +50,9 @@ b = Counter(rhythm1)
 attr14 = b.most_common(1)
 attr15 = attr14[0][1] / len(rhythm1)
 attr16 = max(rhythm1) - min(rhythm1)
-a1 = attr15 / 60000;
-a2 = attr14[0][0] / 60000;
-a3 = attr16 / 60000;
+a1 = attr15 / 60000
+a2 = attr14[0][0] / 60000
+a3 = attr16 / 60000
 attr17 = a1 / (2 * a2 * a3)
 attr22 = sum(rhythm2) / len(rhythm2)
 attr21 = 60000 / attr22
@@ -63,45 +62,9 @@ attr24 = b.most_common(1)
 attr25 = attr24[0][1] / len(rhythm2)
 attr26 = max(rhythm2) - min(rhythm2)
 a1 = attr25 / 60000;
-a2 = attr24[0][0] / 60000;
-a3 = attr26 / 60000;
+a2 = attr24[0][0] / 60000
+a3 = attr26 / 60000
 attr27 = a1 / (2 * a2 * a3)
-
-plt.figure(1, figsize=(16, 4))
-plt.subplot(2, 1, 1)
-plt.title('Ритмограмма №1')
-plt.xlabel('t, мс')
-plt.ylabel('RRi, мс')
-plt.plot(t1, rhythm1), plt.grid
-
-plt.subplot(2, 1, 2)
-plt.title('Ритмограмма №2')
-plt.xlabel('t, мс')
-plt.ylabel('RRi, мс')
-plt.plot(t2, rhythm2, 'r'), plt.grid
-
-plt.figure(2, figsize=(16, 10))
-plt.subplot(2, 2, 1)
-plt.title('Скаттерограмма №1')
-plt.xlabel('RRi+1, мс')
-plt.ylabel('RRi, мс')
-plt.scatter(rhythm1[1:len(rhythm1)], rhythm1[0:len(rhythm1) - 1])
-plt.subplot(2, 2, 2)
-plt.title('Скаттерограмма №2')
-plt.xlabel('RRi+1, мс')
-plt.ylabel('RRi, мс')
-plt.scatter(rhythm2[1:len(rhythm2)], rhythm2[0:len(rhythm2) - 1])
-plt.subplot(2, 2, 3)
-plt.title('Гистограмма №1')
-plt.xlabel('RRi, мс')
-plt.ylabel('К-во RR')
-plt.hist(rhythm1, alpha=1)
-plt.subplot(2, 2, 4)
-plt.title('Гистограмма №2')
-plt.xlabel('RRi, мс')
-plt.ylabel('К-во RR')
-plt.hist(rhythm2)
-plt.show()
 
 print('Ритмограмма №1')
 print(['ЧСС, уд/хв', attr11])
@@ -119,3 +82,57 @@ print(['Mo, мс', attr24])
 print(['AMo, %', attr25])
 print(['MxDMn, мс', attr26])
 print(['ИН', attr27])
+
+
+import tkinter as tk
+from tkinter import ttk
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+
+import numpy as np
+
+root = tk.Tk()
+root.title("Оцінка варіабельності серцевого ритму")
+tabControl = ttk.Notebook(root)
+
+tab1 = ttk.Frame(tabControl)
+tab2 = ttk.Frame(tabControl)
+
+tabControl.add(tab1, text ='Ритм 1.txt')
+tabControl.add(tab2, text ='Ритм 2.txt')
+tabControl.pack(expand = 1, fill ="both")
+
+
+def myplot(root, t, rhythm):
+    fig = Figure(figsize=(5, 4), dpi=100)
+
+    fig.subplots_adjust(hspace=0.5, wspace=0.5)
+
+    p1 = fig.add_subplot(211)
+    p1.set_title('Ритмограмма №1')
+    p1.set_xlabel('t, мс')
+    p1.set_ylabel('RRi, мс')
+    p1.plot(t, rhythm)
+
+    p2 = fig.add_subplot(223)
+    p2.set_title('Скаттерограмма №1')
+    p2.set_xlabel('RRi+1, мс')
+    p2.set_ylabel('RRi, мс')
+    p2.scatter(rhythm[1:len(rhythm)], rhythm[0:len(rhythm) - 1])
+
+    p3 = fig.add_subplot(224)
+    p3.set_title('Гистограмма №1')
+    p3.set_xlabel('RRi, мс')
+    p3.set_ylabel('К-во RR')
+    p3.hist(rhythm, alpha=1)
+
+    canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
+    canvas.draw()
+    canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+
+myplot(tab1, t1, rhythm1)
+myplot(tab2, t2, rhythm2)
+
+root.mainloop()
