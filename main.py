@@ -66,14 +66,30 @@ a2 = attr24[0][0] / 60000
 a3 = attr26 / 60000
 attr27 = a1 / (2 * a2 * a3)
 
+# table
+from prettytable import PrettyTable
+
+x = PrettyTable()
+
+x.field_names = ["Param", "Value"]
+x.add_row(["ЧСС, уд/хв", attr11])
+x.add_row(["NN, мс", attr12])
+x.add_row(["SDNN, м", attr13])
+x.add_row(["Mo, мс", attr14])
+x.add_row(["AMo, %", attr15])
+x.add_row(["MxDMn, мс", attr16])
+x.add_row(["ИН", attr17])
+
 print('Ритмограмма №1')
-print(['ЧСС, уд/хв', attr11])
-print(['NN, мс', attr12])
-print(['SDNN, мс', attr13])
-print(['Mo, мс', attr14])
-print(['AMo, %', attr15])
-print(['MxDMn, мс', attr16])
-print(['ИН', attr17], '\n')
+print(x)
+
+# print(['ЧСС, уд/хв', attr11])
+# print(['NN, мс', attr12])
+# print(['SDNN, мс', attr13])
+# print(['Mo, мс', attr14])
+# print(['AMo, %', attr15])
+# print(['MxDMn, мс', attr16])
+# print(['ИН', attr17], '\n')
 print('Ритмограмма №2')
 print(['ЧСС, уд/хв', attr21])
 print(['NN, мс', attr22])
@@ -84,13 +100,24 @@ print(['MxDMn, мс', attr26])
 print(['ИН', attr27])
 
 
+#
+# x.add_row(["Adelaide", 1295, 1158259, 600.5])
+# x.add_row(["Brisbane", 5905, 1857594, 1146.4])
+# x.add_row(["Darwin", 112, 120900, 1714.7])
+# x.add_row(["Hobart", 1357, 205556, 619.5])
+# x.add_row(["Sydney", 2058, 4336374, 1214.8])
+# x.add_row(["Melbourne", 1566, 3806092, 646.9])
+# x.add_row(["Perth", 5386, 1554769, 869.4])
+
+print(x)
+
+
 import tkinter as tk
 from tkinter import ttk
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-import numpy as np
 
 root = tk.Tk()
 root.title("Оцінка варіабельності серцевого ритму")
