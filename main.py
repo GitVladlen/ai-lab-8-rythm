@@ -142,7 +142,7 @@ plot_rhytm(panel1, rhythm1, 1)
 plot_scatter_and_hist(panel1, rhythm1, 1)
 
 table1 = makeTable(rhythm1_params)
-tk.Label(panel1, text=str(table1), font="Consolas 10", bg="white").pack(side=tk.LEFT, padx=5, pady=5)
+tk.Label(panel1, text=str(table1), font="Consolas 11", bg="white").pack(side=tk.LEFT, padx=5, pady=5)
 
 # tab 2 content
 panel2 = tk.PanedWindow(tab2)
@@ -153,6 +153,6 @@ plot_rhytm(panel2, rhythm2, 2)
 plot_scatter_and_hist(panel2, rhythm2, 2)
 
 table2 = makeTable(rhythm2_params)
-tk.Label(panel2, text=str(table2), font="Consolas 10", bg="white").pack(side=tk.LEFT, padx=5, pady=5)
+tk.Label(panel2, text=str(table2), font="Consolas 11", bg="white").pack(side=tk.LEFT, padx=5, pady=5)
 
 root.mainloop()
