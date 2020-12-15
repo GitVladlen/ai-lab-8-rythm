@@ -1,5 +1,13 @@
 from collections import Counter
-import statistics
+import numpy as np
+
+import tkinter as tk
+from tkinter import ttk
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+
+from prettytable import PrettyTable
 
 rhythm1 = []
 with open('Ритм 1.txt') as f:
@@ -12,155 +20,139 @@ with open('Ритм 2.txt') as f:
         rhythm2.append(float(line))
 
 f.close()
-i = 0
-tt = 0
-t1 = []
-while i < len(rhythm1):
-    t1.append(tt)
-    tt += 0.05
-    i += 1
-i = 0
-tt = 0
-t2 = []
-while i < len(rhythm2):
-    t2.append(tt)
-    tt += 0.05
-    i += 1
 
-i = min(rhythm1) - 50
-x1 = []
-y1 = []
-while i < max(rhythm1):
-    x1.append(i)
-    y1.append(i)
-    i += 1
 
-i = min(rhythm2) - 50
-x2 = []
-y2 = []
-while i < max(rhythm2):
-    x2.append(i)
-    y2.append(i)
-    i += 1
+def CHSS(signal):
+    sec = 60000
+    return sec / np.mean(signal)
 
-attr12 = sum(rhythm1) / len(rhythm1)
-attr11 = 60000 / attr12
-attr13 = statistics.stdev(rhythm1)
-b = Counter(rhythm1)
-attr14 = b.most_common(1)
-attr15 = attr14[0][1] / len(rhythm1)
-attr16 = max(rhythm1) - min(rhythm1)
-a1 = attr15 / 60000
-a2 = attr14[0][0] / 60000
-a3 = attr16 / 60000
-attr17 = a1 / (2 * a2 * a3)
-attr22 = sum(rhythm2) / len(rhythm2)
-attr21 = 60000 / attr22
-attr23 = statistics.stdev(rhythm2)
-b = Counter(rhythm2)
-attr24 = b.most_common(1)
-attr25 = attr24[0][1] / len(rhythm2)
-attr26 = max(rhythm2) - min(rhythm2)
-a1 = attr25 / 60000;
-a2 = attr24[0][0] / 60000
-a3 = attr26 / 60000
-attr27 = a1 / (2 * a2 * a3)
+
+def NN(signal):
+    return 1 / CHSS(signal)
+
+
+def SDNN(signal):
+    return np.std(signal)
+
+
+def Mo(signal):
+    return Counter(signal).most_common(1)[0][0]
+
+
+def AM0(signal):
+    return Counter(signal).most_common(1)[0][1] / len(signal) * 100
+
+
+def MxDMN(signal):
+    return (max(signal) - min(signal))
+
+
+def IH(signal):
+    return AM0(signal) / (2 * Mo(signal) * MxDMN(signal))
+
+
+rhythm1_params = [
+    CHSS(rhythm1),
+    NN(rhythm1),
+    SDNN(rhythm1),
+    Mo(rhythm1),
+    AM0(rhythm1),
+    MxDMN(rhythm1),
+    IH(rhythm1),
+]
+
+rhythm2_params = [
+    CHSS(rhythm2),
+    NN(rhythm2),
+    SDNN(rhythm2),
+    Mo(rhythm2),
+    AM0(rhythm2),
+    MxDMN(rhythm2),
+    IH(rhythm2),
+]
+
 
 # table
-from prettytable import PrettyTable
+def makeTable(attrs):
+    table = PrettyTable()
 
-x = PrettyTable()
+    table.field_names = ["Параметр", "Значення"]
+    rows = ["ЧСС, уд/хв", "NN, мс", "SDNN, м", "Mo, мс", "AMo, %", "MxDMn, мс", "ИН"]
+    for row, attr in zip(rows, attrs):
+        table.add_row([row, "{:.7f}".format(attr)])
 
-x.field_names = ["Param", "Value"]
-x.add_row(["ЧСС, уд/хв", attr11])
-x.add_row(["NN, мс", attr12])
-x.add_row(["SDNN, м", attr13])
-x.add_row(["Mo, мс", attr14])
-x.add_row(["AMo, %", attr15])
-x.add_row(["MxDMn, мс", attr16])
-x.add_row(["ИН", attr17])
-
-print('Ритмограмма №1')
-print(x)
-
-print(['ЧСС, уд/хв', attr11])
-print(['NN, мс', attr12])
-print(['SDNN, мс', attr13])
-print(['Mo, мс', attr14])
-print(['AMo, %', attr15])
-print(['MxDMn, мс', attr16])
-print(['ИН', attr17], '\n')
-
-print('Ритмограмма №2')
-print(['ЧСС, уд/хв', attr21])
-print(['NN, мс', attr22])
-print(['SDNN, мс', attr23])
-print(['Mo, мс', attr24])
-print(['AMo, %', attr25])
-print(['MxDMn, мс', attr26])
-print(['ИН', attr27])
-
-
-#
-# x.add_row(["Adelaide", 1295, 1158259, 600.5])
-# x.add_row(["Brisbane", 5905, 1857594, 1146.4])
-# x.add_row(["Darwin", 112, 120900, 1714.7])
-# x.add_row(["Hobart", 1357, 205556, 619.5])
-# x.add_row(["Sydney", 2058, 4336374, 1214.8])
-# x.add_row(["Melbourne", 1566, 3806092, 646.9])
-# x.add_row(["Perth", 5386, 1554769, 869.4])
-
-print(x)
-
-
-import tkinter as tk
-from tkinter import ttk
-
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
+    return table
 
 
 root = tk.Tk()
 root.title("Оцінка варіабельності серцевого ритму")
+
 tabControl = ttk.Notebook(root)
 
 tab1 = ttk.Frame(tabControl)
 tab2 = ttk.Frame(tabControl)
 
-tabControl.add(tab1, text ='Ритм 1.txt')
-tabControl.add(tab2, text ='Ритм 2.txt')
-tabControl.pack(expand = 1, fill ="both")
+tabControl.add(tab1, text='Ритм 1.txt')
+tabControl.add(tab2, text='Ритм 2.txt')
+tabControl.pack(expand=1, fill="both")
 
 
-def myplot(root, t, rhythm):
-    fig = Figure(figsize=(5, 4), dpi=100)
-
+def plot_rhytm(root, rhythm, index):
+    fig = Figure(figsize=(12, 2), dpi=100)
     fig.subplots_adjust(hspace=0.5, wspace=0.5)
 
-    p1 = fig.add_subplot(211)
-    p1.set_title('Ритмограмма №1')
+    p1 = fig.add_subplot(111)
+    p1.set_title("Ритмограма №{}".format(index))
     p1.set_xlabel('t, мс')
-    p1.set_ylabel('RRi, мс')
-    p1.plot(t, rhythm)
-
-    p2 = fig.add_subplot(223)
-    p2.set_title('Скаттерограмма №1')
-    p2.set_xlabel('RRi+1, мс')
-    p2.set_ylabel('RRi, мс')
-    p2.scatter(rhythm[1:len(rhythm)], rhythm[0:len(rhythm) - 1])
-
-    p3 = fig.add_subplot(224)
-    p3.set_title('Гистограмма №1')
-    p3.set_xlabel('RRi, мс')
-    p3.set_ylabel('К-во RR')
-    p3.hist(rhythm, alpha=1)
+    p1.set_ylabel('R-R[i], мс')
+    p1.plot(rhythm)
 
     canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
     canvas.draw()
     canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
 
-myplot(tab1, t1, rhythm1)
-myplot(tab2, t2, rhythm2)
+def plot_scatter_and_hist(root, rhythm, index):
+    fig = Figure(figsize=(8, 4), dpi=100)
+    fig.subplots_adjust(hspace=0.5, wspace=0.5)
+
+    p2 = fig.add_subplot(121)
+    p2.set_title("Скатерограма №{}".format(index))
+    p2.set_xlabel('R-R[i+1], мс')
+    p2.set_ylabel('R-R[i], мс')
+    p2.scatter(rhythm[1:len(rhythm)], rhythm[0:len(rhythm) - 1])
+
+    p3 = fig.add_subplot(122)
+    p3.set_title("Гістограма №{}".format(index))
+    p3.set_xlabel('R-R[i], мс')
+    p3.set_ylabel('К-во R-R')
+    p3.hist(rhythm, alpha=1, bins=int(max(rhythm)/50))
+
+    canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
+    canvas.draw()
+    canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+
+
+# tab 1 content
+panel1 = tk.PanedWindow(tab1)
+panel1.configure(bg="white")
+panel1.pack(fill=tk.BOTH, expand=1)
+
+plot_rhytm(panel1, rhythm1, 1)
+plot_scatter_and_hist(panel1, rhythm1, 1)
+
+table1 = makeTable(rhythm1_params)
+tk.Label(panel1, text=str(table1), font="Consolas 10", bg="white").pack(side=tk.LEFT, padx=5, pady=5)
+
+# tab 2 content
+panel2 = tk.PanedWindow(tab2)
+panel2.configure(bg="white")
+panel2.pack(fill=tk.BOTH, expand=1)
+
+plot_rhytm(panel2, rhythm2, 2)
+plot_scatter_and_hist(panel2, rhythm2, 2)
+
+table2 = makeTable(rhythm2_params)
+tk.Label(panel2, text=str(table2), font="Consolas 10", bg="white").pack(side=tk.LEFT, padx=5, pady=5)
 
 root.mainloop()
